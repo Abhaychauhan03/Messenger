@@ -1,14 +1,6 @@
-import { Avatar, IconButton } from "@material-ui/core";
-import {
-  AttachFileOutlined,
-  InsertEmoticon,
-  MoreVertOutlined,
-  NotificationsNone,
-} from "@material-ui/icons";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import styled from "styled-components";
 import { auth, db } from "../firebase";
 import { useState } from "react";
 import firebase from "firebase/compat/app";
@@ -18,6 +10,11 @@ import Message from "./Message";
 import getRecipientEmail from "../utils/getRecipientEmail";
 import TimeAgo from "timeago-react";
 import { useRef } from "react";
+import NotificationIcon from "./icons/NotificationIcon";
+import ThreeDots from "./icons/ThreeDots";
+import InsertEmoji from "./icons/insertEmoji";
+import AttachFile from "./icons/attachFile";
+import Image from "next/image";
 
 function ChatScreen({ chat, messages }) {
   const [user] = useAuthState(auth);
@@ -91,12 +88,12 @@ function ChatScreen({ chat, messages }) {
   const recipientEmail = getRecipientEmail(chat.users, user);
 
   return (
-    <Container>
-      <Header>
-        <HeaderInformation>
-          <h3>{recipientEmail}</h3>
+    <div>
+      <div className="items-center shadow-md border-b border-solid border-gray-300 sticky top-0 z-50 bg-white flex p-3 h-20">
+        <div className="ml-4 flex-[1]">
+          <h3 className="font-bold m-0 mb-1">{recipientEmail}</h3>
           {recipientSnapshot ? (
-            <p>
+            <p className="text-sm text-gray-500 m-0">
               Last active:{" "}
               {recipient?.lastSeen?.toDate() ? (
                 <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
@@ -105,33 +102,41 @@ function ChatScreen({ chat, messages }) {
               )}
             </p>
           ) : (
-            <p>Loading Last active</p>
+            <p className="text-sm text-gray-500 m-0">Loading Last active</p>
           )}
-        </HeaderInformation>
-        <HeaderIcons>
-          <IconButton>
-            <NotificationsNone />
-          </IconButton>
-          <IconButton>
-            <MoreVertOutlined />
-          </IconButton>
-        </HeaderIcons>
-        <IconButton>
-          {recipient ? (
-            <Avatar src={recipient?.photoURL} />
-          ) : (
-            <Avatar>{recipientEmail[0]}</Avatar>
-          )}
-        </IconButton>
-      </Header>
+        </div>
+        <div className="flex items-center">
+          <div className="hover:bg-slate-300 p-4 rounded-full">
+            <NotificationIcon />
+          </div>
+          <div className="hover:bg-slate-300 p-4 rounded-full">
+            <ThreeDots />
+          </div>
+          <div className="flex items-center rounded-full hover:bg-slate-300 p-2">
+            {recipient ? (
+              <Image
+                height={40}
+                width={40}
+                className="rounded-full"
+                src={recipient?.photoURL}
+              />
+            ) : (
+              <div className="w-11 h-11 leading-none flex items-center justify-center rounded-full bg-stone-500 uppercase text-white text-3xl font-semibold">
+                <p className="mr-[2px] mb-[1px]">{recipientEmail[0]}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-      <MessageContainer>
+      <div className="p-7 bg-slate-200 min-h-[90vh]">
         {showMessages()}
-        <EndOfMessage ref={endOfMessagesRef} />
-      </MessageContainer>
+        <div className="mb-12" ref={endOfMessagesRef} />
+      </div>
 
-      <InputContainer>
-        <Input
+      <form className="z-50 shadow-lg flex items-center p-3 sticky bottom-0 bg-white">
+        <input
+          className="bg-slate-200 p-5 mr-4 flex-[1] outline-0 border-none rounded-lg"
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
@@ -140,86 +145,13 @@ function ChatScreen({ chat, messages }) {
         <button hidden disabled={!input} type="submit" onClick={sendMessage}>
           Send Message
         </button>
-        <Icons>
-          <InsertEmoticon />
-          <AttachFileOutlined />
-        </Icons>
-      </InputContainer>
-    </Container>
+        <div className="flex items-center justify-around min-w-20">
+          <InsertEmoji />
+          <AttachFile />
+        </div>
+      </form>
+    </div>
   );
 }
 
 export default ChatScreen;
-
-const Container = styled.div``;
-
-const Header = styled.div`
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: white;
-  display: flex;
-  padding: 11px;
-  height: 80px;
-  align-items: center;
-  border-bottom: 1px solid whitesmoke;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
-`;
-
-const HeaderInformation = styled.div`
-  margin-left: 15px;
-  flex: 1;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-
-  > h3 {
-    margin: 0;
-    margin-bottom: 5px;
-  }
-
-  > p {
-    font-size: 14px;
-    color: gray;
-    margin: 0;
-  }
-`;
-
-const HeaderIcons = styled.div``;
-
-const MessageContainer = styled.div`
-  padding: 30px;
-  background-color: whitesmoke;
-  min-height: 90vh;
-`;
-
-const EndOfMessage = styled.div`
-  margin-bottom: 50px;
-`;
-
-const InputContainer = styled.form`
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  position: sticky;
-  bottom: 0;
-  background-color: white;
-  z-index: 100;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
-`;
-
-const Input = styled.input`
-  flex: 1;
-  outline: 0;
-  border: none;
-  border-radius: 10px;
-  background-color: whitesmoke;
-  padding: 20px;
-  margin-right: 15px;
-`;
-
-const Icons = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  min-width: 90px;
-`;

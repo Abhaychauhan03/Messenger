@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { useAuthState } from "react-firebase-hooks/auth";
-import styled from "styled-components";
 import ChatScreen from "../../components/ChatScreen";
 import SideBar from "../../components/Sidebar";
 import { auth, db } from "../../firebase";
@@ -9,15 +8,16 @@ function Chat({ chat, messages }) {
   const [user] = useAuthState(auth);
 
   return (
-    <Container>
+    <div className="flex">
       <Head>
         <title>Chat with {getRecipientEmail(chat.users, user)}</title>
+        <link rel="icon" href="/logo.ico" />
       </Head>
       <SideBar />
-      <ChatContainer>
+      <div className="flex-[1] overflow-scroll h-[100vh] no-scrollbar">
         <ChatScreen chat={chat} messages={messages} />
-      </ChatContainer>
-    </Container>
+      </div>
+    </div>
   );
 }
 
@@ -54,19 +54,3 @@ export async function getServerSideProps(context) {
     },
   };
 }
-
-const Container = styled.div`
-  display: flex;
-`;
-
-const ChatContainer = styled.div`
-  flex: 1;
-  overflow: scroll;
-  height: 100vh;
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-`;

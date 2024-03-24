@@ -1,23 +1,11 @@
-import styled from "styled-components";
-import { Avatar, Button, createTheme, ThemeProvider } from "@material-ui/core";
-import SearchIcon from "@material-ui/icons/Search";
 import * as EmailValidator from "email-validator";
 import { auth, db } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Chat from "./Chat";
-import { AddCircleRounded } from "@material-ui/icons";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#009BCA",
-    },
-    secondary: {
-      main: "#673BB7",
-    },
-  },
-});
+import SearchIcon from "./icons/SearchIcon";
+import AddCircle from "./icons/AddCircle";
+import Image from "next/image";
 
 function Sidebar() {
   const [user] = useAuthState(auth);
@@ -51,103 +39,38 @@ function Sidebar() {
     !!chatsSnapshot?.docs.find((chat) =>
       chat.data().users.find((user) => user === recipientEmail)
     );
-
   return (
-    <Container>
-      <Header>
-        <Logo src="/hlogo.png" />
-        <UserAvatar src={user?.photoURL} onClick={() => auth.signOut()} />
-      </Header>
-
-      <Search>
+    <div className="no-scrollbar text-slate-700 font-medium min-w-80 max-w-96 overflow-y-scroll flex-[0.45] border-r border-solid border-slate-300 h-[100vh]">
+      <div className="p-4 h-20 border-b border-solid border-slate-300 flex sticky top-0 bg-white z-10 justify-between items-center">
+        <img className="w-32" src="/hlogo.png" />
+        <Image
+          height={40}
+          width={40}
+          className="rounded-full"
+          src={user?.photoURL}
+          onClick={() => auth.signOut()}
+        />
+      </div>
+      <div className="flex items-center p-3 m-1 rounded-md border-stone-300 border">
         <SearchIcon />
-        <SearchInput placeholder="Search for people and groups" />
-      </Search>
+        <input
+          className="outline-0 border-none flex-[1] ml-2"
+          placeholder="Search for people and groups"
+        />
+      </div>
 
-      <ThemeProvider theme={theme}>
-        <SidebarButton
-          onClick={createChat}
-          style={{ color: "#455a64", fontWeight: "600" }}
-        >
-          <Addicon>
-            <AddCircleRounded fontSize="large" color="primary" />
-          </Addicon>
-          New Conversation
-        </SidebarButton>
-      </ThemeProvider>
-
+      <button
+        className="w-full text-slate-700  flex items-center font-bold justify-center py-3 bg-blue-200 border-t border-solid border-slate-300"
+        onClick={createChat}
+      >
+        <AddCircle />
+        New Conversation
+      </button>
       {chatsSnapshot?.docs.map((chat) => (
         <Chat key={chat.id} id={chat.id} users={chat.data().users} />
       ))}
-    </Container>
+    </div>
   );
 }
 
 export default Sidebar;
-
-const Container = styled.div`
-  flex: 0.45;
-  border-right: 1px solid whitesmoke;
-  height: 100vh;
-  min-width: 300px;
-  max-width: 350px;
-  overflow-y: scroll;
-  color: #455a64;
-  font-weight: 500;
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-`;
-
-const Header = styled.div`
-  display: flex;
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 1;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  height: 80px;
-  border-bottom: 1px solid whitesmoke;
-`;
-
-const Logo = styled.img`
-  width: 125px;
-`;
-
-const UserAvatar = styled(Avatar)``;
-
-const Search = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  border-radius: 2px;
-`;
-
-const SearchInput = styled.input`
-  outline-width: 0;
-  border: none;
-  flex: 1;
-  margin-left: 10px;
-`;
-
-const Addicon = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-`;
-
-const SidebarButton = styled(Button)`
-  width: 100%;
-
-  &&& {
-    background-color: aliceblue;
-    border-top: 1px solid whitesmoke;
-    border-bottom: 1px solid whitesmoke;
-  }
-`;
