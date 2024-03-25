@@ -89,7 +89,7 @@ function ChatScreen({ chat, messages }) {
 
   return (
     <div>
-      <div className="items-center shadow-md border-b border-solid border-gray-300 sticky top-0 z-50 bg-white flex p-3 h-20">
+      <header className="items-center shadow-md border-b border-solid border-gray-300 sticky top-0 z-50 bg-white flex p-3 h-20">
         <div className="ml-4 flex-[1]">
           <h3 className="font-bold m-0 mb-1">{recipientEmail}</h3>
           {recipientSnapshot ? (
@@ -127,7 +127,7 @@ function ChatScreen({ chat, messages }) {
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="p-7 bg-slate-200 min-h-[90vh]">
         {showMessages()}
